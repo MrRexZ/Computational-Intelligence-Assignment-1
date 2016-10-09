@@ -6,65 +6,43 @@ public class Main {
 
 	public static void main(String args[])
 	{
-		final int gen = 10;
-		
-		//User should enter only 1 value (0-100), and system should be able to automatically convert
-		//to the respective bit representation.
-		
-		System.out.print("Enter 8 values: ");
-		Scanner single = new Scanner(System.in);
-		Scanner scan = new Scanner(single.nextLine());
-		int [] input = new int[8];
+		final int gen = 10;//Change the generation here
+		System.out.print("Enter a value between 0 to 255: ");
+		Scanner scan = new Scanner(System.in);
+		int input = scan.nextInt();
 		StringBuilder records = new StringBuilder();
 		
-		
-		//Should correct this loop below as per requirement stated in LINE 11.
-		for(int a = 0; a < 8; a++)
+		if(input < 0 || input > 255)//Validation for the 0 - 255 value
 		{
-			if(scan.hasNext())
-			{
-				input[a] = scan.nextInt();
-			}
-			else
-			{
-				System.out.println("Not enough numbers are provided!");
-				break;
-			}
+			System.out.print("Invalud input, please reenter a value between 0 to 255: ");
+			input = scan.nextInt();
 		}
+		byte b = (byte)input;//Conversion to byte
+		//Keep last 8 bits, bitwise AND operator to ensure positive value between 0 - 255 is retained
+		//If we enter a value 4, the output will be 100, the previous 5 value is empty because its 0, hence we will get spaces, we then replace to replace white spaces to 0
+		String binaryInput = String.format("%8s",Integer.toBinaryString(b & 0xFF)).replace(" ", "0");
+		String[] stringInput = binaryInput.split("");
+		//After splitting, the first element is definitely an empty element due to the nature of split operation, we do copyofRange to remove the first element
+		stringInput = Arrays.copyOfRange(stringInput, 1, stringInput.length);
+		int[] intInput = new int[8];
+		for(int a = 0; a < intInput.length; a++)//Operation to parse the string numbers into integer
+		{
+			intInput[a] = Integer.parseInt(stringInput[a]);
+		}
+		System.out.println("8-bit representation of number " + input + " : " + Arrays.toString(intInput));
 		
-		
-		//Shouldn't these 3 lines below be inside the loop? Otherwise it will contain gen+1 generation.
-		records.append(Crossover(input));
-		records.append(Mutation(input));
-		System.out.println(records);
-		
-		
-		//For StringBuilder in records, you should clear the ciphertext (but not the cross-over point and mutation point.) generated 
-		//from previous generation. Otherwise, the original text is visible.
-		//What you can do : Create 3 stringbuilder. 1 is for original text, 1 is for crossover point, 1 is for mutation point.
-		//After generation is finished, append all 3 stringbuilder contents together.
-		for(int x = 0; x < gen; x++)
+		for(int x = 0; x < gen; x++)//Generation starts here
 		{
 			System.out.println("Generating generation " + (x+1) + "...");
-			//Clear the stringbuilder containing texts. We only need to keep the last generation text.
-			//Append the crossover point and mutation point to their RESPECTIVE stringbuilder.
-			records.append(Crossover(input));
-			records.append(Mutation(input));
-			System.out.println(records);
+			records.append(Crossover(intInput));//We use stringBuilder to append both the keys into a single integer variable
+			records.append(Mutation(intInput));
+			System.out.println("Records of the secretkey: " + records);
+			System.out.println("\n-------------------------------------------------------------\n");
 		}
-		
-		//Append all 3 stringbuilder texts here after all generation is finished as final String.
-		
-		
 	}
 	
-	
-	//For this method below, intial idea of crossover should be between 2 components (key and the input). But this is fine although
-	//is less secure than initial idea.
-	public static String Crossover(int[] input)
+	public static String Crossover(int[] input)//Crossover operation swaps the position of two elements in the array, stimulating swapping bits position
 	{
-		
-		
 		Random rand = new Random();
 		int Ckey1 = rand.nextInt(7);
 		int Ckey2 = rand.nextInt(7);
@@ -78,22 +56,22 @@ public class Main {
 		input[Ckey2] = temp;
 		
 		String theCkeys = Integer.toString(Ckey1) + Integer.toString(Ckey2);
-		System.out.println(Arrays.toString(input));
+		System.out.println("Crossover changes: " + Arrays.toString(input));
 		return theCkeys;
 	}
 	
-	//Mutation should change the bit representation of 1 to 0 and 0 to 1. 
-	public static String Mutation(int[] input)
+	public static String Mutation(int[] input)//Mutation operation changes the selected bit from 0 to 1 or from 1 to 0 (100% chances of happening)
 	{
 		Random rand = new Random();
 		int Mkey = rand.nextInt(7);
 		
-		
-		//255 below should be replaced by 1
-		input[Mkey] = 255 - input[Mkey];
+		if(input[Mkey] == 0)
+			input[Mkey] = 1;
+		else
+			input[Mkey] = 0;
 		
 		String theMkey = Integer.toString(Mkey);
-		System.out.println(Arrays.toString(input));
+		System.out.println("Mutation changes: " + Arrays.toString(input));
 		return theMkey;
 	}
 }
