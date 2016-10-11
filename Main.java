@@ -6,39 +6,32 @@ public class Main {
 
 	public static void main(String args[])
 	{
-		final int gen = 10;//Change the generation here
+		final int gen = 2;//Change the generation here
 		System.out.print("Enter a value between 0 to 255: ");
 		Scanner scan = new Scanner(System.in);
-		int input = scan.nextInt();
-		StringBuilder records = new StringBuilder();
+		String[] inputString = scan.next().split("");
+		int input = inputString[0].charAt(0);//Loop here
+		System.out.println(input);
 		
-		if(input < 0 || input > 255)//Validation for the 0 - 255 value
-		{
-			System.out.print("Invalud input, please reenter a value between 0 to 255: ");
-			input = scan.nextInt();
-		}
-		byte b = (byte)input;//Conversion to byte
-		//Keep last 8 bits, bitwise AND operator to ensure positive value between 0 - 255 is retained
-		//If we enter a value 4, the output will be 100, the previous 5 value is empty because its 0, hence we will get spaces, we then replace to replace white spaces to 0
-		String binaryInput = String.format("%8s",Integer.toBinaryString(b & 0xFF)).replace(" ", "0");
-		String[] stringInput = binaryInput.split("");
-		//After splitting, the first element is definitely an empty element due to the nature of split operation, we do copyofRange to remove the first element
-		stringInput = Arrays.copyOfRange(stringInput, 1, stringInput.length);
-		int[] intInput = new int[8];
-		for(int a = 0; a < intInput.length; a++)//Operation to parse the string numbers into integer
-		{
-			intInput[a] = Integer.parseInt(stringInput[a]);
-		}
-		System.out.println("8-bit representation of number " + input + " : " + Arrays.toString(intInput));
+		int[] intInput = conversion(input);
+		
+		StringBuilder records = new StringBuilder();
 		
 		for(int x = 0; x < gen; x++)//Generation starts here
 		{
+			System.out.println("8-bit representation of number " + input + " : " + Arrays.toString(intInput));
 			System.out.println("Generating generation " + (x+1) + "...");
 			records.append(Crossover(intInput));//We use stringBuilder to append both the keys into a single integer variable
 			records.append(Mutation(intInput));
 			System.out.println("Records of the secretkey: " + records);
 			System.out.println("\n-------------------------------------------------------------\n");
 		}
+		
+
+		System.out.println("Result of " + input + " : " + Arrays.toString(intInput));
+		//ANNHiddenLayer ANN= new ANNHiddenLayer();
+		//ANN.preProcess(records);
+		
 	}
 	
 	public static String Crossover(int[] input)//Crossover operation swaps the position of two elements in the array, stimulating swapping bits position
@@ -74,4 +67,41 @@ public class Main {
 		System.out.println("Mutation changes: " + Arrays.toString(input));
 		return theMkey;
 	}
+
+	public static int[] conversion(int input)
+	{	
+		byte b = (byte)input;//Conversion to byte
+		//Keep last 8 bits, bitwise AND operator to ensure positive value between 0 - 255 is retained
+		//If we enter a value 4, the output will be 100, the previous 5 value is empty because its 0, hence we will get spaces, we then replace to replace white spaces to 0
+		String binaryInput = String.format("%8s",Integer.toBinaryString(b & 0xFF)).replace(" ", "0");
+		String[] stringInput = binaryInput.split("");
+		//After splitting, the first element is definitely an empty element due to the nature of split operation, we do copyofRange to remove the first element
+		//System.out.println(stringInput.toString());
+		int[] intInput = new int[8];
+		
+		for(int a = 0; a < intInput.length; a++)//Operation to parse the string numbers into integer
+		{
+			intInput[a] = Integer.parseInt(stringInput[a]);
+		}
+		
+		return intInput;
+	}
+	
+	/*public static boolean comparison(int[] ori, int[] current)
+	{
+		int differences = 0;
+		
+		for(int a = 0; a < ori.length; a++)
+		{
+			if(ori[a] != current[a])
+			{
+				differences++;
+			}
+		}
+		
+		if(differences >= 4)
+			return true;
+		else
+			return false;
+	}*/
 }
