@@ -14,6 +14,8 @@ import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.nnet.learning.MomentumBackpropagation;
 import org.neuroph.util.TransferFunctionType;
 
+import UIInterface.MainInterface;
+
 
 public class ANNCategorization implements LearningEventListener {
 	private static final int MAX_BIT = 8;
@@ -23,7 +25,13 @@ public class ANNCategorization implements LearningEventListener {
 	private ArrayList<Character> mutPoint = new ArrayList<Character>();
     private static double[][] transCrossPoint;
     private static double[][] transMutPoint;	
+    private static MainInterface UI;
 
+    public ANNCategorization(MainInterface refUI) {
+    	UI = refUI;
+    }
+    
+    
 	public double[][][] run(int generation) {
         NeuralNetwork categorizationMLNN = NeuralNetwork.createFromFile("categorization.nnet");
         
@@ -35,8 +43,8 @@ public class ANNCategorization implements LearningEventListener {
         
         for (int gen=0;gen<maxGeneration;gen++) {
 
-       	 	System.out.println("============================================");
-       	 	System.out.println("Generation: " + gen);
+        	UI.decryptionList.append("============================================\n");
+        	UI.decryptionList.append("Generation: " + gen + "\n");
         	this.categorizeCrossOverPoint(inputSet, categorizationMLNN, gen);
         	this.categorizeMutationPoint(inputSet,  categorizationMLNN, gen);
 
@@ -72,18 +80,18 @@ public class ANNCategorization implements LearningEventListener {
         LearningRule learningRule = myMlPerceptron.getLearningRule();
         learningRule.addListener((LearningEventListener) this);
         
-        System.out.println("Training neural network...");
+        UI.categorizationTrainingIterationList.append("Training neural network...\n");
         myMlPerceptron.learn(trainingSet);
 
    
-        System.out.println("Testing trained neural network");
+        UI.categorizationTrainingIterationList.append("Testing trained neural network\n");
         testNeuralNetwork(myMlPerceptron, trainingSet);
 
         myMlPerceptron.save("categorization.nnet");
 
         NeuralNetwork loadedMlPerceptron = NeuralNetwork.createFromFile("categorization.nnet");
 
-        System.out.println("Testing loaded neural network");
+        UI.categorizationTrainingIterationList.append("Testing loaded neural network\n");
         testNeuralNetwork(loadedMlPerceptron, testSet);
         
        
@@ -99,11 +107,11 @@ public class ANNCategorization implements LearningEventListener {
              neuralNet.calculate();
              double[] networkOutput = neuralNet.getOutput();
 
-             System.out.print("Input: " + Arrays.toString( testSetRow.getInput() ) );
+             UI.categorizationTrainingIterationList.append("Input: " + Arrays.toString( testSetRow.getInput() ) + "\n");
              for(int i = 0; i < networkOutput.length; i++){
              	networkOutput[i] =  Math.round(networkOutput[i]);
              }
-             System.out.println(" Output: " + Arrays.toString(networkOutput) );
+             UI.categorizationTrainingIterationList.append(" Output: " + Arrays.toString(networkOutput) + "\n");
          }
      }
 
@@ -111,7 +119,7 @@ public class ANNCategorization implements LearningEventListener {
 	 public void handleLearningEvent(LearningEvent event) {
          BackPropagation bp = (BackPropagation)event.getSource();
          if (event.getEventType() != LearningEvent.Type.LEARNING_STOPPED)
-             System.out.println(bp.getCurrentIteration() + ". iteration : "+ bp.getTotalNetworkError());
+        	 UI.categorizationTrainingIterationList.append(bp.getCurrentIteration() + ". iteration : "+ bp.getTotalNetworkError()+ "\n");
      }    
 	 
 	public void preProcess(StringBuilder string) {
@@ -122,7 +130,7 @@ public class ANNCategorization implements LearningEventListener {
 			if (((i+1) % 3) == 0 ) {
 				this.mutPoint.add(string.charAt(i));
 				this.crossPoint.add((ArrayList<Character>) temp.clone());
-				System.out.println(crossPoint.toString());
+				UI.decryptionList.append(crossPoint.toString()+ "\n");
 
 				temp.clear();
 			}
@@ -143,7 +151,7 @@ public class ANNCategorization implements LearningEventListener {
 		        for (int i=0; i< MAX_BIT; i++) {
 		        	transCrossPoint[gen][i]=output[0][i]+output[1][i];
 		        }
-		        System.out.println("The final output is "+ Arrays.deepToString(transCrossPoint));
+		        UI.decryptionList.append("Decrypt crossover output is "+ Arrays.deepToString(transCrossPoint));
 
 	}
 	
@@ -157,7 +165,7 @@ public class ANNCategorization implements LearningEventListener {
         	transMutPoint[gen][i]=output[0][i];
         }
         
-        System.out.println("The final output is "+ Arrays.deepToString(transMutPoint));
+        UI.decryptionList.append("Decrypt mutation output is "+ Arrays.deepToString(transMutPoint));
 	}
 	
 	  public static double[][] prodOutput(NeuralNetwork neuralNet, DataSet testSet, int inputAmount) {
@@ -169,7 +177,7 @@ public class ANNCategorization implements LearningEventListener {
 	            neuralNet.calculate();
 	            double[] networkOutput = neuralNet.getOutput().clone();
 
-	            System.out.print("Input: " + Arrays.toString( testSetRow.getInput() ) );
+	            UI.decryptionList.append("Input: " + Arrays.toString( testSetRow.getInput() ) );
 	            for(int i = 0; i < networkOutput.length; i++){
 	            	networkOutput[i] =  Math.round(networkOutput[i]);
 	            }

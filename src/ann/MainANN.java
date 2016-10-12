@@ -2,16 +2,20 @@ package ann;
 
 import java.util.Arrays;
 
+import UIInterface.MainInterface;
+
 public class MainANN {
 
 	private static StringBuilder records;
 	private static int generation;
 	private static double[][][] crossAndMut;
 	private static int[] cipherText;
+	private static MainInterface UI;
 	
 	
 	
-	public MainANN(StringBuilder s,int gen , int[] intInput) {
+	public MainANN(MainInterface uiRef,StringBuilder s,int gen , int[] intInput) {
+		UI=uiRef;
 		records=s;
 		generation=gen;
 		cipherText=intInput;
@@ -21,14 +25,13 @@ public class MainANN {
 	}
 	
 	public char decrypt() {
-		ANNCategorization ANNcat= new ANNCategorization();
+		ANNCategorization ANNcat= new ANNCategorization(UI);
 		
 		ANNcat.preProcess(records);
 
 		crossAndMut = ANNcat.run(generation);
 
-        System.out.println("FINAL CIPHER :" + Arrays.toString(cipherText));
-		ANNSwapElement ANNswap= new ANNSwapElement();
+		ANNSwapElement ANNswap= new ANNSwapElement(UI);
 		int[] decryptedText = ANNswap.run(generation,cipherText,crossAndMut);
 		
 		StringBuilder text = new StringBuilder();
@@ -37,7 +40,7 @@ public class MainANN {
 		}
 		
 		int decryptedChar = Integer.parseInt(text.toString(), 2);
-		System.out.println((char)decryptedChar);
+		UI.decryptionList.append("Decrypted char : " +(char)decryptedChar + "\n");
 		return ((char) decryptedChar);
 	}
 }

@@ -12,6 +12,8 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.util.TransferFunctionType;
 
+import UIInterface.MainInterface;
+
 public class ANNSwapElement implements LearningEventListener {
 
 	private static final int CROSSOVER_INDEX=0;
@@ -22,6 +24,12 @@ public class ANNSwapElement implements LearningEventListener {
 	private static int maxGeneration;
 	private static int[] cipherText;
 	private static double[][][] crossAndMut;
+
+    private static MainInterface UI;
+    
+    public ANNSwapElement(MainInterface refUI) {
+    	UI=refUI;
+    }
 	
 	    public int[] run(int generation, int[] cipher,double[][][] crossMut) {
 	    	
@@ -39,9 +47,9 @@ public class ANNSwapElement implements LearningEventListener {
 	         cipherText=cipher;
 	         for (int gen=0;gen<maxGeneration;gen++) {
 	        	 
-	        	 System.out.println("=================");
+	        	 UI.decryptionList.append("=================\n");
 
-	        	 System.out.println("Generation : " + gen);
+	        	 UI.decryptionList.append("Generation : " + gen+ "\n");
 	        	 double[] mutCurGen= crossAndMut[MUTATION_INDEX][gen];
 	        	 double[] crossCurGen= crossAndMut[CROSSOVER_INDEX][gen];
 	        	 for (int cipherIndex=0;cipherIndex<cipherText.length;cipherIndex++) {
@@ -52,7 +60,7 @@ public class ANNSwapElement implements LearningEventListener {
 
         		 swapCrossOver(crossInputSet, crossOverDecryptMLNN, crossCurGen);
 
-	        	 System.out.println("=================");
+        		 UI.decryptionList.append("=================\n");
 	         }
 	         return cipherText;
 	    }
@@ -95,14 +103,11 @@ public class ANNSwapElement implements LearningEventListener {
 	        trainingSet.addRow(new DataSetRow(new double[]{0,1}, new double[]{1}));
 	        trainingSet.addRow(new DataSetRow(new double[]{1,0}, new double[]{1}));
 	        trainingSet.addRow(new DataSetRow(new double[]{1,1}, new double[]{0}));
-	        DataSet testSet= new DataSet(1);
-	        testSet.addRow(new DataSetRow(new double[]{0}));
 	        
 	        MultiLayerPerceptron myMlPerceptron = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 2, 2, 1);
 
 	        myMlPerceptron.setLearningRule(new BackPropagation());
 	        
-
 	        LearningRule learningRule = myMlPerceptron.getLearningRule();
 	        learningRule.addListener((LearningEventListener) this);
 	        myMlPerceptron.learn(trainingSet);
@@ -123,7 +128,7 @@ public class ANNSwapElement implements LearningEventListener {
 	       double[] output = prodOutput( neuNetwork , inputSet , 1);
 	        cipherText[cipherIndex] = (int) output[0];
 
-	        System.out.println("Decrypt Mutation: " + Arrays.toString(cipherText));
+	        UI.decryptMutation.append("Decrypt Mutation: " + Arrays.toString(cipherText) + "\n");
 	    }
 	    
 	    public static void swapCrossOver(DataSet inputSet, NeuralNetwork neuNetwork,  double[] crossOver) {
@@ -143,7 +148,7 @@ public class ANNSwapElement implements LearningEventListener {
 	        cipherText[left]					= (int) output[0];
 	        cipherText[right]					= (int) output[1];
 	        
-	        System.out.println(String.format("Decrypt CrossOver at [%s,%s] : %s",left,right,Arrays.toString(cipherText) ));
+	        UI.decryptCrossover.append(String.format("Decrypt CrossOver at [%s,%s] : %s\n",left,right,Arrays.toString(cipherText) ));
 
 	    }
 
@@ -156,7 +161,9 @@ public class ANNSwapElement implements LearningEventListener {
 			            neuralNet.calculate();
 			            double[] networkOutput = neuralNet.getOutput().clone();
 
-			            System.out.print("Input: " + Arrays.toString( testSetRow.getInput() ) );
+			            UI.decryptionList.append("Input: " + Arrays.toString( testSetRow.getInput() ) + "\n");
+			       
+			            	
 			            for(int i = 0; i < networkOutput.length; i++){
 			            	networkOutput[i] =  Math.round(networkOutput[i]);
 			            }
@@ -173,17 +180,19 @@ public class ANNSwapElement implements LearningEventListener {
 	            neuralNet.calculate();
 	            double[] networkOutput = neuralNet.getOutput();
 
-	            System.out.print("Input: " + Arrays.toString( testSetRow.getInput() ) );
+	            	UI.swapTrainingIteration.append("Input: " + Arrays.toString( testSetRow.getInput() ) + "\n");
+	            
 	            for(int i = 0; i < networkOutput.length; i++){
 	            	networkOutput[i] =  Math.round(networkOutput[i]);
 	            }
-	            System.out.println(" Output: " + Arrays.toString(networkOutput) );
+	            
+	            	UI.swapTrainingIteration.append(" Output: " + Arrays.toString(networkOutput) + "\n");
 	        }
 	    }
 	    
 	    public void handleLearningEvent(LearningEvent event) {
 	        BackPropagation bp = (BackPropagation)event.getSource();
 	        if (event.getEventType() != LearningEvent.Type.LEARNING_STOPPED)
-	            System.out.println(bp.getCurrentIteration() + ". iteration : "+ bp.getTotalNetworkError());
+	        	UI.swapTrainingIteration.append(bp.getCurrentIteration() + ". iteration : "+ bp.getTotalNetworkError() + "\n");
 	    }    
 }
