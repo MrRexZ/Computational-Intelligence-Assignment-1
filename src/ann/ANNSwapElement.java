@@ -1,6 +1,6 @@
 package ann;
 
-import java.util.Arrays;
+import java.util.Arrays; 
 
 import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.data.DataSet;
@@ -12,7 +12,7 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.util.TransferFunctionType;
 
-import UIInterface.MainInterface;
+import UIInterface.MainDecryptionInterface;
 
 public class ANNSwapElement implements LearningEventListener {
 
@@ -25,9 +25,9 @@ public class ANNSwapElement implements LearningEventListener {
 	private static int[] cipherText;
 	private static double[][][] crossAndMut;
 
-    private static MainInterface UI;
+    private static MainDecryptionInterface UI;
     
-    public ANNSwapElement(MainInterface refUI) {
+    public ANNSwapElement(MainDecryptionInterface refUI) {
     	UI=refUI;
     }
 	
@@ -47,9 +47,8 @@ public class ANNSwapElement implements LearningEventListener {
 	         cipherText=cipher;
 	         for (int gen=0;gen<maxGeneration;gen++) {
 	        	 
-	        	 UI.decryptionList.append("=================\n");
 
-	        	 UI.decryptionList.append("Generation : " + gen+ "\n");
+	        	 UI.decryptionList.append(String.format("Generation %d of CipherText %s: \n", gen, Arrays.toString(cipher)));
 	        	 double[] mutCurGen= crossAndMut[MUTATION_INDEX][gen];
 	        	 double[] crossCurGen= crossAndMut[CROSSOVER_INDEX][gen];
 	        	 for (int cipherIndex=0;cipherIndex<cipherText.length;cipherIndex++) {
@@ -123,12 +122,12 @@ public class ANNSwapElement implements LearningEventListener {
 
 	        inputSet.clear();
 	        
-	        //Add for mutation
+	        //Add a mutation dataset
 	        inputSet.addRow(new DataSetRow(new double[]{cipherText[cipherIndex], mutation[cipherIndex]}));
 	       double[] output = prodOutput( neuNetwork , inputSet , 1);
 	        cipherText[cipherIndex] = (int) output[0];
 
-	        UI.decryptMutation.append("Decrypt Mutation: " + Arrays.toString(cipherText) + "\n");
+	     //   UI.decryptMutation.append("Decrypt Mutation: " + Arrays.toString(cipherText) + "\n");
 	    }
 	    
 	    public static void swapCrossOver(DataSet inputSet, NeuralNetwork neuNetwork,  double[] crossOver) {
@@ -140,7 +139,7 @@ public class ANNSwapElement implements LearningEventListener {
 	        while (crossOver[++left]==0);
 	        while (crossOver[--right]==0);
 	        
-	        //Add for crossOver
+	        //Add a crossover data set
 	        inputSet.addRow(new DataSetRow(new double[]{cipherText[left], 1 ,cipherText[right]}));
 	       
 	        double[] output=prodOutput(neuNetwork, inputSet,2);
@@ -148,7 +147,7 @@ public class ANNSwapElement implements LearningEventListener {
 	        cipherText[left]					= (int) output[0];
 	        cipherText[right]					= (int) output[1];
 	        
-	        UI.decryptCrossover.append(String.format("Decrypt CrossOver at [%s,%s] : %s\n",left,right,Arrays.toString(cipherText) ));
+	      //  UI.decryptCrossover.append(String.format("Decrypt CrossOver at [%s,%s] : %s\n",left,right,Arrays.toString(cipherText) ));
 
 	    }
 
@@ -161,7 +160,7 @@ public class ANNSwapElement implements LearningEventListener {
 			            neuralNet.calculate();
 			            double[] networkOutput = neuralNet.getOutput().clone();
 
-			            UI.decryptionList.append("Input: " + Arrays.toString( testSetRow.getInput() ) + "\n");
+			            UI.decryptionList.append("Neural Network SwapElement Input: " + Arrays.toString( testSetRow.getInput() ) + "\n");
 			       
 			            	
 			            for(int i = 0; i < networkOutput.length; i++){
@@ -192,7 +191,9 @@ public class ANNSwapElement implements LearningEventListener {
 	    
 	    public void handleLearningEvent(LearningEvent event) {
 	        BackPropagation bp = (BackPropagation)event.getSource();
-	        if (event.getEventType() != LearningEvent.Type.LEARNING_STOPPED)
+	        if (event.getEventType() != LearningEvent.Type.LEARNING_STOPPED) {
 	        	UI.swapTrainingIteration.append(bp.getCurrentIteration() + ". iteration : "+ bp.getTotalNetworkError() + "\n");
+	        	System.out.println(bp.getCurrentIteration() + ". iteration : "+ bp.getTotalNetworkError() + "\n");
+	        }
 	    }    
 }
