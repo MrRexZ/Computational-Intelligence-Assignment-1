@@ -1,7 +1,9 @@
 # Computational-Intelligence-Assignment-1
 An AI-based group assignment for Sunway University's CI module, which utilizes the concept of machine learning to create 2 modules by perform computational oprations of textual encryption & decryption and air-conditioned fuzzy system.
+Detailed descriptions of how each of the algorithm works are described [in this report](https://github.com/MrRexZ/Computational-Intelligence-Assignment-1/blob/master/demo/docs/CI-Assignment-1%20Report.docx?raw=true)
 
 ## Textual Encryption & Decryption System
+![Encryption & Decryption](https://github.com/MrRexZ/Computational-Intelligence-Assignment-1/blob/master/demo/images/EncryptionAndDecryption.gif?raw=true)
 ### Encryption 
 The system are capable of encrypting a plaintext of user input by converting it to a ciphertext and secret key, both of which must be in kept in pair for the purpose of successfull decryption. This process is carried out entirely by the use of Genetic Algorithms.
 Excerpt from our report describing how the process works : 
@@ -16,7 +18,9 @@ During the development of the genetic algorithm, we faced the problem to choose 
 ### Decryption
 Decryption is carried out with by the use of Artificial Neural Network, and there are a total of 2 neural networks in total.
 Description:
+![Decryption Process](https://github.com/MrRexZ/Computational-Intelligence-Assignment-1/blob/master/demo/images/DescriptionofHowDecryptionWork.PNG?raw=true)
 
 ## Air Conditioned Fuzzy System
+![AirConFuzzySystem](https://github.com/MrRexZ/Computational-Intelligence-Assignment-1/blob/master/demo/images/AirConFuzzySystem.gif?raw=true)
 Basing on a user survey conducted, we form a ruleset which allows the system to determine a coldness level based on user input's of air conditioner temperature and weather temperature by incorporating fuzzy logic.
 
